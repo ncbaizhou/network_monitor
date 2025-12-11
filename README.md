@@ -59,4 +59,8 @@ Logs are automatically saved in ping_log_YYYYMMDD.txt
 本项目采用 MIT License，允许任何人自由使用、修改和分享（详见 LICENSE 文件）。
 This project is licensed under the MIT License, which allows anyone to freely use, modify, and share it (see LICENSE document for details).
 
+# 如果你觉得这个脚本有用，欢迎(If you find this script useful, feel free to)：
+Star仓库 ⭐ Star the repository ️
+提交Issue（发现bug或建议） Submit an Issue (if you find a bug or have suggestions)  
+PR贡献（优化代码） Contribute via PR (to optimize the code)
 
