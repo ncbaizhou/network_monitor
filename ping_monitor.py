@@ -66,6 +66,11 @@ def ping_host(host_ip):
             return int(match.group(1))
 
 def main():
+    # 创建日志目录（如果不存在）
+    log_dir = "network_logs"
+    os.makedirs(log_dir, exist_ok=True)
+    log_file = os.path.join(log_dir, f"ping_log_{datetime.now().strftime('%Y%m%d')}.txt")
+    
     if len(sys.argv) < 2:
         print("用法：python ping_monitor.py <hosts.txt或hosts.xml>")
         print("示例：python ping_monitor.py network_hosts.xml")
@@ -73,6 +78,10 @@ def main():
     
     hosts = load_hosts(sys.argv[1])
     log_file = f"ping_log_{datetime.now().strftime('%Y%m%d')}.txt"
+    
+    # 初始化缓存（内存存储未写入的日志）
+    log_cache = []
+    MAX_CACHE_SIZE = 100  # 最大缓存100条（约100秒数据）
     
     print(f"\n🚀 开始监控！日志将保存到: {log_file}\n")
     
@@ -100,13 +109,38 @@ def main():
                 print(f"主机: {name.ljust(15)}{status_line}")
                 print(f"IP:   {ip.ljust(15)}")
                 
-                # 日志记录（保持原有格式）
+                # ✅ 生成日志字符串并缓存（不立即写入文件）
+                log_entry = f"{datetime.now().strftime('%H:%M:%S')} | {name} | {ip} | {status_line}\n"
+                log_cache.append(log_entry)
+                
+                # 保持缓存大小不超过MAX_CACHE_SIZE
+                if len(log_cache) > MAX_CACHE_SIZE:
+                    log_cache.pop(0)  # 丢弃最旧记录
+    
+            # ✅ 每秒尝试写入缓存（关键逻辑）
+            try:
                 with open(log_file, 'a', encoding='utf-8') as f:
-                    f.write(f"{datetime.now().strftime('%H:%M:%S')} | {name} | {ip} | {status_line}\n")
+                    f.writelines(log_cache)  # 批量写入所有缓存
+                log_cache = []  # 写入成功后清空缓存
+                print("✅ 日志已成功保存到文件")
+            except PermissionError:
+                # 文件被占用，继续缓存（不中断监控）
+                print("⚠️ 日志文件被占用，已缓存当前数据（等待可用）")
+            except Exception as e:
+                print(f"⚠️ 日志写入错误: {e}")
             
             time.sleep(1)
     except KeyboardInterrupt:
         print("\n\n🛑 监控已停止，感谢使用！")
+        
+        # 退出前尝试写入剩余缓存
+        if log_cache:
+            try:
+                with open(log_file, 'a', encoding='utf-8') as f:
+                    f.writelines(log_cache)
+                print(f"✅ 退出时已保存 {len(log_cache)} 条缓存日志")
+            except:
+                print("⚠️ 退出时无法保存缓存日志")
 
 if __name__ == "__main__":
     main()
