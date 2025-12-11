@@ -19,7 +19,6 @@ def load_hosts(file_path):
             for line in f:
                 ip = line.strip()
                 if ip:
-                    # TXT格式：名称 = IP（自动填充）
                     hosts.append((ip, ip))
         print(f"✅ 已加载 {len(hosts)} 个主机（TXT格式）")
         return hosts
@@ -30,7 +29,6 @@ def load_hosts(file_path):
             hosts = []
             for host in tree.findall('.//host'):
                 ip = host.text.strip() if host.text else ""
-                # 新增：优先用name属性，没有则用IP当名称
                 name = host.get('name', ip) if ip else ""
                 if ip:
                     hosts.append((name, ip))
@@ -49,7 +47,6 @@ def ping_host(host_ip):
     cmd = ['ping', '-n', '1', '-w', '1000', host_ip] if os.name == 'nt' else ['ping', '-c', '1', '-i', '0.5', host_ip]
     
     try:
-        # 关键修复：Windows用GBK编码
         if os.name == 'nt':
             output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, timeout=1.5).decode('gbk', errors='ignore')
         else:
@@ -58,19 +55,15 @@ def ping_host(host_ip):
         print(f"⚠️ Ping命令执行失败: {e}")
         return None
     
-    # 三重匹配策略（中文Windows必备）
     if os.name == 'nt':
-        match = re.search(r'时间\s*=\s*(\d+)', output)
+        # 修复：同时匹配 "时间=1ms" 和 "时间<1ms"
+        match = re.search(r'时间\s*=?<?\s*(\d+)', output)
         if match:
             return int(match.group(1))
+        # 其他可能的匹配（保留）
         match = re.search(r'time\s*=\s*(\d+)', output, re.IGNORECASE)
         if match:
             return int(match.group(1))
-        print(f"⚠️ 未匹配到延迟值（主机: {host_ip}）\n实际输出: {output[:200]}...")
-        return None
-    else:
-        match = re.search(r'time\s*=\s*(\d+\.\d+)', output)
-        return float(match.group(1)) if match else None
 
 def main():
     if len(sys.argv) < 2:
@@ -93,22 +86,23 @@ def main():
             
             for name, ip in hosts:
                 delay = ping_host(ip)
-                # 状态emoji：🟢=正常, 🟠=慢, 🔴=丢包
+                
+                # 状态判断
                 if delay is None:
-                    status = "❌ 丢包"
+                    status_line = "❌ 丢包"
                     emoji = "🔴"
                 elif delay < 50:
-                    status = f"✅ {delay}ms"
-                    emoji = "🟢"
+                    status_line = f"🟢 {delay}ms"
                 else:
-                    status = f"🟡 {delay}ms"
-                    emoji = "🟠"
+                    status_line = f"🟠 {delay}ms"
                 
-                # 显示名称+IP（名称优先）
-                print(f"主机: {name.ljust(15)} | IP: {ip.ljust(15)} | 状态: {emoji} {status}")
+                # ✅ 两行对齐显示（关键优化！）
+                print(f"主机: {name.ljust(15)}{status_line}")
+                print(f"IP:   {ip.ljust(15)}")
                 
+                # 日志记录（保持原有格式）
                 with open(log_file, 'a', encoding='utf-8') as f:
-                    f.write(f"{datetime.now().strftime('%H:%M:%S')} | {name} | {ip} | {status}\n")
+                    f.write(f"{datetime.now().strftime('%H:%M:%S')} | {name} | {ip} | {status_line}\n")
             
             time.sleep(1)
     except KeyboardInterrupt:
