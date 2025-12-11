@@ -116,9 +116,8 @@ def main():
                 else:
                     status_line = f"🟠 {delay}ms"
                 
-                # ✅ 两行对齐显示（关键优化！）
-                print(f"主机: {name.ljust(15)}{status_line}")
-                print(f"IP:   {ip.ljust(15)}")
+                # ✅ 修改：将所有信息合并为一行显示
+                print(f"{name.ljust(15)} | {ip.ljust(15)} | {status_line}")
                 
                 # ✅ 生成日志字符串并缓存（不立即写入文件）
                 log_entry = f"{datetime.now().strftime('%H:%M:%S')} | {name} | {ip} | {status_line}\n"
