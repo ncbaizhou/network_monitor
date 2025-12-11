@@ -6,6 +6,9 @@ from datetime import datetime
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
+import socket
+    
+    # 原有ping逻辑...
 
 def load_hosts(file_path):
     """加载主机列表，支持txt/xml格式（新增名称支持）"""
@@ -43,6 +46,14 @@ def load_hosts(file_path):
         sys.exit(1)
 
 def ping_host(host_ip):
+    """执行单次ping，返回延迟(ms)或None（丢包）"""
+    # 添加DNS解析检查
+    try:
+        socket.gethostbyname(host_ip)
+    except socket.gaierror:
+        print(f"⚠️ 域名解析失败: {host_ip}")
+        return None
+    
     """执行单次ping，返回延迟(ms)或None（丢包）"""
     cmd = ['ping', '-n', '1', '-w', '1000', host_ip] if os.name == 'nt' else ['ping', '-c', '1', '-i', '0.5', host_ip]
     
