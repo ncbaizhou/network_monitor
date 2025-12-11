@@ -26,13 +26,10 @@ python --version
 ### 2️⃣ 配置主机列表 Configure the host list
 编辑hosts.xml（用VS Code或记事本都可以，我自己用notepad--）
 Edit hosts.xml (using VS Code or Notepad is fine, I use notepad myself--)
-<?xml version="1.0" encoding="UTF-8"?>
-<hosts>
     <!-- 用你的名称替换IP（如：服务器71） -->
     <host name="百度">www.baidu.com</host>
     <host name="服务器71">172.17.2.1</host>
     <host name="阿里DNS">223.5.5.5</host>
-</hosts>
 ### 3️⃣ 运行监控 Run monitoring
 python ping_monitor.py hosts.xml
 或者直接运行其中的“一键运行.bat”即可，因此也可以添加到计划任务当中
