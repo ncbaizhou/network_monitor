@@ -1,0 +1,5 @@
+<hosts>
+    <host name="百度">www.baidu.com</host>
+    <host name="服务器71">172.17.2.1</host>
+    <host>172.17.2.2</host>
+</hosts>
