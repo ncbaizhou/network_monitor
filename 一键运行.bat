@@ -1,1 +1,1 @@
-python ping_monitor.py hosts.xml
+python ping_monitor.py
