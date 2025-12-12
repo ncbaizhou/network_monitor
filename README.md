@@ -31,7 +31,7 @@ Edit hosts.xml (using VS Code or Notepad is fine, I use notepad myself--)
     <host name="服务器71">172.17.2.1</host>
     <host name="阿里DNS">223.5.5.5</host>
 ### 3️⃣ 运行监控 Run monitoring
-python ping_monitor.py hosts.xml
+python ping_monitor.py
 或者直接运行其中的“一键运行.bat”即可，因此也可以添加到计划任务当中
 Or just run the "One-click Run .bat" in it, so it can also be added to the scheduled task
 💡 提示：按 Ctrl + C 停止监控
