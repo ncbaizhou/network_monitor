@@ -169,16 +169,16 @@ def main():
                     else:
                         status_line = f"🟠 {result}ms | {os_type}"
                     
-                    # ✅ 将所有信息合并为一行显示
-                    print(f"{name.ljust(15)} | {ip.ljust(15)} | {status_line}")
+                # ✅ 将所有信息合并为一行显示
+                print(f"{name.ljust(15)} | {ip.ljust(15)} | {status_line}")
                     
-                    # ✅ 生成日志字符串并缓存
-                    log_entry = f"{datetime.now().strftime('%H:%M:%S')} | {name} | {ip} | {status_line}\n"
-                    log_cache.append(log_entry)
+                # ✅ 生成日志字符串并缓存
+                log_entry = f"{datetime.now().strftime('%H:%M:%S')} | {name} | {ip} | {status_line}\n"
+                log_cache.append(log_entry)
                     
-                    # 保持缓存大小不超过MAX_CACHE_SIZE
-                    if len(log_cache) > MAX_CACHE_SIZE:
-                        log_cache.pop(0)  # 丢弃最旧记录
+                # 保持缓存大小不超过MAX_CACHE_SIZE
+                if len(log_cache) > MAX_CACHE_SIZE:
+                    log_cache.pop(0)  # 丢弃最旧记录
             
             # ✅ 每秒尝试写入缓存（关键逻辑）
             try:
